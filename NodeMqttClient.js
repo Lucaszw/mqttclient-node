@@ -78,7 +78,7 @@ class NodeMqttClient {
     const channel = `${this.base}/state${state}`;
     this.on(event, (d) => this.sendMessage(channel, d, retain, qos, dup));
   }
-  sendMessage(topic, msg, retain=false, qos=0, dup=false){
+  sendMessage(topic, msg={}, retain=false, qos=0, dup=false){
     const message = JSON.stringify(msg);
     const options = this.MessageOptions(retain,qos,dup);
     this.client.publish(topic, message, options);
