@@ -60,9 +60,10 @@ class NodeMqttClient {
   get version() {return "0.0"}
   // ** Methods **
   addGetRoute(topic, method) {
-    this.addRoute(topic, method);
+    console.error("<NodeMqttClient>:: GET ROUTE DEPRICATED: ", topic, method);
+    // this.addRoute(topic, method);
     // Replace content within curly brackets with "+" wildcard
-    this.subscriptions.push(topic.replace(/\{(.+?)\}/g, "+"));
+    // this.subscriptions.push(topic.replace(/\{(.+?)\}/g, "+"));
   }
   addPostRoute(topic, event, retain=false, qos=0, dup=false){
     // TODO: Depricate channel (instead use base/plugin)
@@ -92,8 +93,8 @@ class NodeMqttClient {
   onConnect() {
     // XXX: Depricating subscriptions to base
     //      Move to using same subscription model as WebMqttClient
-    this.client.subscribe(`${this.base}/#`);
-    for (var s of this.subscriptions) this.client.subscribe(s);
+    // this.client.subscribe(`${this.base}/#`);
+    // for (var s of this.subscriptions) this.client.subscribe(s);
     this.listen();
     this.trigger("start",null);
   }
