@@ -34,6 +34,7 @@ class NodeMqttClient {
 
     // XXX: ignoreState variable used internally by crossroads
     this.ignoreState = true;
+    this.clientId = this.ClientID();
   }
   listen() {
     console.error(`No listen method implemented for ${this.name}`);
@@ -55,9 +56,6 @@ class NodeMqttClient {
       return;
     }
     return __dirname;
-  }
-  get clientId() {
-    return `${this.name}>>${this.filepath}>>${Date.now()}`;
   }
   get version() {return "0.0"}
   // ** Methods **
@@ -124,6 +122,10 @@ class NodeMqttClient {
     options.qos = qos;
     options.dup = dup;
     return options;
+  }
+  ClientID() {
+    const num = Math.ceil(Math.random()*1000);
+    return `${this.name}>>${this.filepath}>>${Date.now()}.${num}`;
   }
 };
 
