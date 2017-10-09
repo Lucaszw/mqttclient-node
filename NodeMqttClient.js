@@ -30,6 +30,10 @@ class NodeMqttClient {
   listen() {
     console.error(`No listen method implemented for ${this.name}`);
   }
+  get connected() {
+    return this.client.connected;
+  }
+
   get name() {
     return encodeURI(this.constructor.name.split(/(?=[A-Z])/).join('-').toLowerCase());
   }
