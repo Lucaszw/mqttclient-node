@@ -13,6 +13,14 @@ function resolveTarget(target){
   return target;
 }
 
+const decamelize = (str, sep='-') => {
+  // https://github.com/sindresorhus/decamelize
+  return str
+    .replace(/([a-z\d])([A-Z])/g, '$1' + sep + '$2')
+    .replace(/([A-Z]+)([A-Z][a-z\d]+)/g, '$1' + sep + '$2')
+    .toLowerCase();
+}
+
 class NodeMqttClient {
   constructor(host="localhost", port=1883, base="microdrop") {
     _.extend(this, Backbone.Events);
@@ -33,9 +41,8 @@ class NodeMqttClient {
   get connected() {
     return this.client.connected;
   }
-
   get name() {
-    return encodeURI(this.constructor.name.split(/(?=[A-Z])/).join('-').toLowerCase());
+    return encodeURI(decamelize(this.constructor.name));
   }
   get filepath() {
     const childName  = this.constructor.name;
