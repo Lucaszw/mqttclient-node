@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const lo = require('lodash');
 const crossroads = require('crossroads');
 const Backbone = require('backbone');
 const mqtt = require('mqtt')
@@ -23,9 +23,9 @@ const decamelize = (str, sep='-') => {
 
 class NodeMqttClient {
   constructor(host="localhost", port=1883, base="microdrop") {
-    _.extend(this, Backbone.Events);
-    _.extend(this, crossroads.create());
-    _.extend(this, MQTTMessages);
+    lo.extend(this, Backbone.Events);
+    lo.extend(this, crossroads.create());
+    lo.extend(this, MQTTMessages);
 
     this.base = base;
     this.port = port;
