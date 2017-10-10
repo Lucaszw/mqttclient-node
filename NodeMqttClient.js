@@ -29,6 +29,7 @@ class NodeMqttClient {
 
     this.base = base;
     this.port = port;
+    this.host = host;
     this.client = this.Client(host,port);
     this.subscriptions = new Array();
 
