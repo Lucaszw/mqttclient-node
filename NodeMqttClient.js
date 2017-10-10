@@ -22,7 +22,7 @@ const decamelize = (str, sep='-') => {
 }
 
 class NodeMqttClient {
-  constructor(host="localhost", port=1883, base="microdrop") {
+  constructor(host="localhost", port=1883, base="microdrop", web=false) {
     lo.extend(this, Backbone.Events);
     lo.extend(this, crossroads.create());
     lo.extend(this, MQTTMessages);
@@ -32,6 +32,7 @@ class NodeMqttClient {
     this.host = host;
     this.client = this.Client(host,port);
     this.subscriptions = new Array();
+    this.web = web;
 
     // XXX: ignoreState variable used internally by crossroads
     this.ignoreState = true;
@@ -49,7 +50,7 @@ class NodeMqttClient {
   get filepath() {
     const childName  = this.constructor.name;
     const parentName =  Object.getPrototypeOf(this.constructor).name;
-    if (childName != parentName){
+    if (childName != parentName && this.web == false){
       throw `CLASS MISSING GETTER METHOD: filepath
       class ${childName} does not contain getter "filepath". Please implement.
       ex: class ${childName} {... get filepath() {return __dirname } ... }

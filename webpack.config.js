@@ -1,17 +1,10 @@
-var config = {
-  entry: './NodeMqttClient.js',
-  output: {
-    filename: 'bundle.common.js',
-    libraryTarget: 'commonjs2'
-  }
-};
-
 var webConfig = {
   entry: './NodeMqttClient.js',
   output: {
     filename: 'bundle.web.js',
-    libraryTarget: 'var'
+    libraryTarget: 'var',
+    library: 'NodeMqttClient'
   }
 };
 
-module.exports = [config, webConfig];
+module.exports = webConfig;
