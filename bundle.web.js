@@ -7096,7 +7096,7 @@ if (IS_BROWSER) {
 /* WEBPACK VAR INJECTION */(function(__dirname) {const lo = __webpack_require__(28);
 const crossroads = __webpack_require__(29);
 const Backbone = __webpack_require__(31);
-const mqtt = __webpack_require__(34)
+const mqtt = __webpack_require__(34);
 
 const MQTTMessages = __webpack_require__(71);
 
@@ -7117,7 +7117,7 @@ const decamelize = (str, sep='-') => {
 }
 
 class NodeMqttClient {
-  constructor(host="localhost", port=1883, base="microdrop", web=false) {
+  constructor(host="localhost", port=1883, base="microdrop") {
     lo.extend(this, Backbone.Events);
     lo.extend(this, crossroads.create());
     lo.extend(this, MQTTMessages);
@@ -7127,7 +7127,7 @@ class NodeMqttClient {
     this.host = host;
     this.client = this.Client(host,port);
     this.subscriptions = new Array();
-    this.web = web;
+    this.mqtt = mqtt;
 
     // XXX: ignoreState variable used internally by crossroads
     this.ignoreState = true;
@@ -7145,7 +7145,7 @@ class NodeMqttClient {
   get filepath() {
     const childName  = this.constructor.name;
     const parentName =  Object.getPrototypeOf(this.constructor).name;
-    if (childName != parentName && this.web == false){
+    if (childName != parentName){
       throw `CLASS MISSING GETTER METHOD: filepath
       class ${childName} does not contain getter "filepath". Please implement.
       ex: class ${childName} {... get filepath() {return __dirname } ... }
@@ -7158,9 +7158,6 @@ class NodeMqttClient {
   // ** Methods **
   addGetRoute(topic, method) {
     console.error("<NodeMqttClient>:: GET ROUTE DEPRICATED: ", topic, method);
-    // this.addRoute(topic, method);
-    // Replace content within curly brackets with "+" wildcard
-    // this.subscriptions.push(topic.replace(/\{(.+?)\}/g, "+"));
   }
   addPostRoute(topic, event, retain=false, qos=0, dup=false){
     // TODO: Depricate channel (instead use base/plugin)
@@ -7188,10 +7185,6 @@ class NodeMqttClient {
   }
   // ** Event Handlers **
   onConnect() {
-    // XXX: Depricating subscriptions to base
-    //      Move to using same subscription model as WebMqttClient
-    // this.client.subscribe(`${this.base}/#`);
-    // for (var s of this.subscriptions) this.client.subscribe(s);
     this.listen();
     this.trigger("start",null);
   }
@@ -7210,8 +7203,6 @@ class NodeMqttClient {
   Client(host,port) {
     const client = mqtt.connect(`mqtt://${host}:${port}`,
       {clientId: this.clientId});
-    console.log("CLIENT::");
-    console.log(client);
     client.on("connect", this.onConnect.bind(this));
     client.on("message", this.onMessage.bind(this));
     return client;
@@ -43943,11 +43934,12 @@ module.exports = ws
 const MqttMessages = new Object();
 
 MqttMessages.addSubscription = function(channel, method){
+  console.log("adding route...");
   this.addRoute(channel, method);
   const subscription = channel.replace(/\{(.+?)\}/g, "+");
   // Ensure client is connected before continuing
-  if (!this.client.connected) {
-    console.error("<MqttMessages>:: Cannot add subscription. Client not connected");
+  if (!this.connected) {
+    console.error(`<MqttMessages>:: ${this.name} ::Cannot add subscription. Client not connected`);
     return subscription;
   }
   // Ensure subscription doesn't already exist
@@ -43955,6 +43947,7 @@ MqttMessages.addSubscription = function(channel, method){
     return subscription;
   // If the client is ready, then subscribe immediately, otherwise add to list
   this.subscriptions.push(subscription);
+  console.log("subscribing.....");
   this.client.subscribe(subscription);
   return subscription;
 }

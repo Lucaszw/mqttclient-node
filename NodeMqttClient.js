@@ -1,7 +1,7 @@
 const lo = require('lodash');
 const crossroads = require('crossroads');
 const Backbone = require('backbone');
-const mqtt = require('mqtt')
+const mqtt = require('mqtt');
 
 const MQTTMessages = require('@mqttclient/mqtt-messages');
 
@@ -22,7 +22,7 @@ const decamelize = (str, sep='-') => {
 }
 
 class NodeMqttClient {
-  constructor(host="localhost", port=1883, base="microdrop", web=false) {
+  constructor(host="localhost", port=1883, base="microdrop") {
     lo.extend(this, Backbone.Events);
     lo.extend(this, crossroads.create());
     lo.extend(this, MQTTMessages);
@@ -32,7 +32,7 @@ class NodeMqttClient {
     this.host = host;
     this.client = this.Client(host,port);
     this.subscriptions = new Array();
-    this.web = web;
+    this.mqtt = mqtt;
 
     // XXX: ignoreState variable used internally by crossroads
     this.ignoreState = true;
@@ -50,7 +50,7 @@ class NodeMqttClient {
   get filepath() {
     const childName  = this.constructor.name;
     const parentName =  Object.getPrototypeOf(this.constructor).name;
-    if (childName != parentName && this.web == false){
+    if (childName != parentName){
       throw `CLASS MISSING GETTER METHOD: filepath
       class ${childName} does not contain getter "filepath". Please implement.
       ex: class ${childName} {... get filepath() {return __dirname } ... }
@@ -63,9 +63,6 @@ class NodeMqttClient {
   // ** Methods **
   addGetRoute(topic, method) {
     console.error("<NodeMqttClient>:: GET ROUTE DEPRICATED: ", topic, method);
-    // this.addRoute(topic, method);
-    // Replace content within curly brackets with "+" wildcard
-    // this.subscriptions.push(topic.replace(/\{(.+?)\}/g, "+"));
   }
   addPostRoute(topic, event, retain=false, qos=0, dup=false){
     // TODO: Depricate channel (instead use base/plugin)
@@ -93,10 +90,6 @@ class NodeMqttClient {
   }
   // ** Event Handlers **
   onConnect() {
-    // XXX: Depricating subscriptions to base
-    //      Move to using same subscription model as WebMqttClient
-    // this.client.subscribe(`${this.base}/#`);
-    // for (var s of this.subscriptions) this.client.subscribe(s);
     this.listen();
     this.trigger("start",null);
   }
