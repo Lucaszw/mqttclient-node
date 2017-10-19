@@ -64,6 +64,12 @@ class NodeMqttClient {
   addGetRoute(topic, method) {
     console.error("<NodeMqttClient>:: GET ROUTE DEPRICATED: ", topic, method);
   }
+  getReceiver(payload) {
+    // XXX: Remove this method from WebServer and PluginModel
+    if (!payload.__head__) return false;
+    if (!payload.__head__.plugin_name) return false;
+    return payload.__head__.plugin_name;
+  }
   addPostRoute(topic, event, retain=false, qos=0, dup=false){
     // TODO: Depricate channel (instead use base/plugin)
     topic = resolveTarget(topic);
@@ -104,6 +110,15 @@ class NodeMqttClient {
       console.log(e);
     }
   }
+  wrapData(key, value) {
+    // Add "__head__" key to msg and also convert to object
+    let msg = new Object();
+    if (typeof(value) == "object" && value !== null) msg = value;
+    else msg[key] = value;
+    msg.__head__ = this.DefaultHeader();
+    return msg;
+  }
+
   // ** Initializers **
   Client(host,port) {
     const client = mqtt.connect(`mqtt://${host}:${port}`,
@@ -111,6 +126,12 @@ class NodeMqttClient {
     client.on("connect", this.onConnect.bind(this));
     client.on("message", this.onMessage.bind(this));
     return client;
+  }
+  DefaultHeader() {
+    const header = new Object();
+    header.plugin_name = this.name;
+    header.plugin_version = this.version;
+    return header;
   }
   MessageOptions(retain=false, qos=0, dup=false) {
     const options = new Object();
